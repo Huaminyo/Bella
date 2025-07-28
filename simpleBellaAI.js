@@ -20,7 +20,6 @@ class SimpleBellaAI {
     async init() {
         try {
             console.log('初始化简化版贝拉AI...');
-            // 模拟初始化过程
             await new Promise(resolve => setTimeout(resolve, 1000));
             this.isInitialized = true;
             console.log('简化版贝拉AI初始化完成');
@@ -33,13 +32,12 @@ class SimpleBellaAI {
     async think(prompt) {
         try {
             console.log('贝拉正在思考:', prompt);
-            
-            // 模拟思考时间
             await new Promise(resolve => setTimeout(resolve, 500 + Math.random() * 1000));
             
-            // 根据模式生成不同风格的回复
-            return this.generateResponse(prompt);
-            
+            const response = this.generateResponse(prompt);
+            this.speak(response); // 让贝拉说话
+            return response;
+
         } catch (error) {
             console.error('思考过程中出现错误:', error);
             return this.getErrorResponse();
@@ -77,7 +75,6 @@ class SimpleBellaAI {
         return randomResponse;
     }
 
-    // 获取错误回应
     getErrorResponse() {
         const errorResponses = [
             "抱歉，我现在有点困惑，让我重新整理一下思路...",
@@ -90,7 +87,20 @@ class SimpleBellaAI {
         return errorResponses[Math.floor(Math.random() * errorResponses.length)];
     }
 
-    // 设置聊天模式
+    // 🗣️ 让贝拉说话（语音合成）
+    speak(text) {
+        if ('speechSynthesis' in window) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'zh-CN'; // Ganti ke 'en-US' atau 'id-ID' sesuai preferensi
+            utterance.pitch = 1;
+            utterance.rate = 1;
+            utterance.volume = 1;
+            speechSynthesis.speak(utterance);
+        } else {
+            console.warn('此浏览器不支持语音合成');
+        }
+    }
+
     setChatMode(mode) {
         if (['casual', 'assistant', 'creative'].includes(mode)) {
             this.currentMode = mode;
@@ -100,7 +110,6 @@ class SimpleBellaAI {
         return false;
     }
 
-    // 获取当前配置信息
     getCurrentConfig() {
         return {
             useCloudAPI: false,
@@ -111,15 +120,13 @@ class SimpleBellaAI {
         };
     }
 
-    // 清除对话历史（简化版无需实际操作）
     clearHistory() {
         console.log('对话历史已清除');
     }
 }
 
-// 将SimpleBellaAI暴露为全局变量
+// 导出全局对象
 window.SimpleBellaAI = SimpleBellaAI;
-// 同时也暴露为BellaAI，保持兼容性
 window.BellaAI = SimpleBellaAI;
 
 console.log('SimpleBellaAI 已加载完成');
